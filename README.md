@@ -62,7 +62,7 @@ The multiclass target contains:
 - `Web Attack - Sql Injection`
 - `Web Attack - XSS`
 
-> The dataset files are not included in this repository. To reproduce the notebook, provide `Dataset1.csv`, `Dataset2.csv` and `Dataset3.csv`, then update the file paths where necessary.
+> The dataset files are not included in this repository. To reproduce the notebook, provide `Dataset1.csv`, `Dataset2.csv` and `Dataset3.csv`, then update the file paths where necessary. [Download the network intrusion dataset](https://drive.google.com/drive/folders/1Ul0wH_ucdp83ju-s13mlIpagrm0PaUQk)
 
 ## Models Evaluated
 
