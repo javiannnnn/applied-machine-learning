@@ -1,24 +1,26 @@
-An applied machine learning project that detects malicious network traffic for a fictional cybersecurity organisation, **XYZ Cybersecurity**.
+"""# Network Intrusion Detection with Machine Learning
+
+An applied machine learning project that detects malicious network traffic for the fictional cybersecurity organisation **XYZ Cybersecurity**.
 
 The project develops and evaluates:
 
 - A **binary classifier** that predicts `BENIGN` or `ATTACK`
 - A **multiclass classifier** that identifies the specific network-traffic category
 - Cost-sensitive decision thresholds for operational deployment
-- A production monitoring and responsible-AI plan
+- A production-monitoring and responsible-AI plan
 
-The complete analysis is contained in AML.ipynb
+The complete analysis, model training and evaluation workflow is available in [`AML.ipynb`](./AML.ipynb).
 
 ## Project Overview
 
-Network-intrusion datasets are highly imbalanced: normal traffic and common denial-of-service attacks greatly outnumber rare attack types. This project therefore evaluates models using metrics that remain meaningful under imbalance, rather than relying only on accuracy.
+Network-intrusion datasets are highly imbalanced: normal traffic and common denial-of-service attacks greatly outnumber rare attack types. This project therefore uses metrics that remain informative under class imbalance instead of relying only on accuracy.
 
 The workflow covers:
 
 1. Dataset loading and consolidation
 2. Data cleaning and exploratory analysis
 3. Binary and multiclass feature engineering
-4. Imbalance handling with SMOTE and class weights
+4. Class-imbalance handling with SMOTE and class weights
 5. Baseline model comparison
 6. Optuna hyperparameter optimisation
 7. Soft-voting and stacking ensembles
@@ -47,7 +49,7 @@ The cleaning process:
 - Removes constant columns
 - Removes the duplicated `Fwd Header Length.1` feature
 
-The multiclass target contains the following traffic categories:
+The multiclass target contains:
 
 - `BENIGN`
 - `Bot`
@@ -60,7 +62,7 @@ The multiclass target contains the following traffic categories:
 - `Web Attack - Sql Injection`
 - `Web Attack - XSS`
 
-> The dataset files are not included in this repository. To reproduce the notebook, provide `Dataset1.csv`, `Dataset2.csv`, and `Dataset3.csv`, then update the file paths where necessary.
+> The dataset files are not included in this repository. To reproduce the notebook, provide `Dataset1.csv`, `Dataset2.csv` and `Dataset3.csv`, then update the file paths where necessary.
 
 ## Models Evaluated
 
@@ -76,7 +78,7 @@ Two multiclass ensembles were also tested:
 - Equal-weight soft voting
 - Three-fold probability stacking
 
-Hyperparameters were optimised with **Optuna's Tree-structured Parzen Estimator sampler**. Matthews Correlation Coefficient was used as the cross-validation objective because it provides a balanced assessment under severe class imbalance.
+Hyperparameters were optimised with **Optuna's Tree-structured Parzen Estimator sampler**. Matthews Correlation Coefficient was used as the cross-validation objective because it gives a balanced assessment under severe class imbalance.
 
 ## Handling Class Imbalance
 
@@ -87,13 +89,13 @@ The original attack labels are combined into a single `ATTACK` class.
 - An 80/20 stratified train-test split is used.
 - SMOTE raises the minority `ATTACK` class to half the size of `BENIGN`.
 - SMOTE is fitted only on training data.
-- During tuning, SMOTE is performed inside each cross-validation fold to prevent leakage.
+- During tuning, SMOTE is performed inside each cross-validation fold to prevent data leakage.
 
 ### Multiclass classification
 
 A layered strategy is used:
 
-- SMOTE is applied to selected minority classes that contain enough real examples.
+- SMOTE is applied to selected minority classes with enough real examples.
 - Balanced class weights support classes that are not oversampled.
 - Ultra-rare classes are not synthetically expanded from only a handful of samples.
 - Every ultra-rare training example is retained in the tuning subset.
@@ -118,7 +120,7 @@ The model detected almost every attack while producing very few false alarms on 
 
 ### Multiclass classification
 
-The tuned **LightGBM** classifier also achieved the best overall multiclass macro F1 score.
+The tuned **LightGBM** classifier also achieved the strongest overall multiclass macro F1 score.
 
 | Model | Accuracy | Macro F1 | Macro F2 | MCC |
 |---|---:|---:|---:|---:|
@@ -129,31 +131,41 @@ The tuned **LightGBM** classifier also achieved the best overall multiclass macr
 | Soft Voting Ensemble | 0.9989 | 0.7947 | 0.8075 | 0.9968 |
 | Logistic Regression | 0.9846 | 0.5437 | 0.5432 | 0.9547 |
 
-Although overall accuracy was close to 100%, macro metrics reveal that rare attack categories remain more difficult to classify. In particular, results for `Heartbleed` and `Web Attack - Sql Injection` should be interpreted cautiously because the test set contains only two and four examples respectively.
+Although overall accuracy was close to 100%, the macro metrics show that rare attack categories remain more difficult to classify. Results for `Heartbleed` and `Web Attack - Sql Injection` should be interpreted cautiously because their test-set support is extremely small.
 
 ## 3D t-SNE Visualisations
 
-The notebook uses PCA followed by three-dimensional t-SNE to visualise local structure in the high-dimensional network-flow data.
+The notebook uses PCA followed by three-dimensional t-SNE to visualise local structure in the high-dimensional network-flow data. The exported figures are stored in the [`t-SNE Plots`](./t-SNE%20Plots) folder.
 
-### Binary classes
+### Binary actual classes
 
-![Binary actual classes](images/Binary%203D%20t-SNE%20Actual%20Classes%20Plot.png)
+![Binary 3D t-SNE showing actual classes](./t-SNE%20Plots/Binary%203D%20t-SNE%20Actual%20Classes%20Plot.png)
 
-![Binary prediction outcomes](images/Binary%203D%20t-SNE%20Prediction%20Outcomes%20Plot.png)
+The embedding shows broad separation between benign and attack traffic, with some overlap where malicious flows have characteristics similar to legitimate activity.
 
-### Multiclass classes
+### Binary prediction outcomes
 
-![Multiclass actual classes](images/Multiclass%203D%20t-SNE%20Actual%20Traffic%20Classes.png)
+![Binary 3D t-SNE showing prediction outcomes](./t-SNE%20Plots/Binary%203D%20t-SNE%20Prediction%20Outcomes%20Plot.png)
 
-![Multiclass correctness](images/Multiclass%203D%20t-SNE%20Correct%20Vs%20Misclassified%20Plot.png)
+Most observations are classified correctly. Missed attacks are concentrated near overlapping class boundaries rather than being distributed randomly.
+
+### Multiclass actual traffic classes
+
+![Multiclass 3D t-SNE showing actual traffic classes](./t-SNE%20Plots/Multiclass%203D%20t-SNE%20Actual%20Traffic%20Classes.png)
+
+Several traffic categories form distinct local structures, while related attack categories show greater overlap.
+
+### Multiclass correctness
+
+![Multiclass 3D t-SNE showing correct and misclassified observations](./t-SNE%20Plots/Multiclass%203D%20t-SNE%20Correct%20Vs%20Misclassified%20Plot.png)
 
 Misclassifications occur in localised regions, primarily where minority attack classes overlap in the reduced feature space.
 
-> t-SNE is used for exploratory visualisation, not as evidence of exact global distances or as an input to the classifiers.
+> t-SNE is used for exploratory visualisation. It is not used as an input to the classifiers, and distances in the embedding should not be interpreted as exact global relationships.
 
 ## Cost-Sensitive Threshold Analysis
 
-In cybersecurity, missing a real attack can be far more expensive than investigating a false alarm. The notebook therefore evaluates decision thresholds using an illustrative cost matrix:
+In cybersecurity, missing a genuine attack can be far more expensive than investigating a false alarm. The notebook therefore evaluates decision thresholds using an illustrative cost matrix.
 
 | Actual / Predicted | BENIGN | ATTACK |
 |---|---:|---:|
@@ -169,7 +181,7 @@ Under these assumptions, the calculated cost-minimising threshold was `0.001`.
 | F2-maximising | 0.280 | 5 | 58 | 0.9999 | 0.9985 |
 | Cost-minimising | 0.001 | 0 | 1,231 | 1.0000 | 0.9698 |
 
-This threshold is not presented as a universal deployment value. It depends heavily on the assumed incident cost, analyst capacity, alert budget, probability calibration, and operational environment.
+This threshold is not presented as a universal deployment value. It depends on the assumed incident cost, analyst capacity, alert budget, probability calibration and operational environment.
 
 ## Exploratory Analysis
 
@@ -206,7 +218,7 @@ The proposed monitoring plan tracks:
 - Attack-flag rate
 - Recall on analyst-confirmed samples
 
-Potential retraining triggers include severe feature drift, severe prediction drift, sustained abnormal alert rates, or a meaningful decline in attack recall.
+Potential retraining triggers include severe feature drift, severe prediction drift, sustained abnormal alert rates or a meaningful decline in attack recall.
 
 ## Responsible Deployment
 
@@ -231,10 +243,11 @@ Important risks include:
 ## Repository Structure
 
 ```text
-.
-├── 240592T_IT3301_Assignment(1).ipynb
-├── Binary 3D t-SNE Actual Classes Plot.png
-├── Binary 3D t-SNE Prediction Outcomes Plot.png
-├── Multiclass 3D t-SNE Actual Traffic Classes.png
-├── Multiclass 3D t-SNE Correct Vs Misclassified Plot.png
-└── README.md
+applied-machine-learning/
+├── AML.ipynb
+├── README.md
+└── t-SNE Plots/
+    ├── Binary 3D t-SNE Actual Classes Plot.png
+    ├── Binary 3D t-SNE Prediction Outcomes Plot.png
+    ├── Multiclass 3D t-SNE Actual Traffic Classes.png
+    └── Multiclass 3D t-SNE Correct Vs Misclassified Plot.png
