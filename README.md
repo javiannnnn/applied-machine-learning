@@ -1,7 +1,3 @@
-from pathlib import Path
-
-readme = r"""# Network Intrusion Detection with Machine Learning
-
 An applied machine learning project that detects malicious network traffic for a fictional cybersecurity organisation, **XYZ Cybersecurity**.
 
 The project develops and evaluates:
@@ -11,7 +7,7 @@ The project develops and evaluates:
 - Cost-sensitive decision thresholds for operational deployment
 - A production monitoring and responsible-AI plan
 
-The complete analysis is contained in [`240592T_IT3301_Assignment(1).ipynb`](240592T_IT3301_Assignment(1).ipynb).
+The complete analysis is contained in AML.ipynb
 
 ## Project Overview
 
