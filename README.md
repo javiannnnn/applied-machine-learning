@@ -1,4 +1,4 @@
-"""# Network Intrusion Detection with Machine Learning
+Network Intrusion Detection with Machine Learning
 
 An applied machine learning project that detects malicious network traffic for the fictional cybersecurity organisation **XYZ Cybersecurity**.
 
